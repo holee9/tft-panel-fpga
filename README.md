@@ -77,7 +77,22 @@ source run_synth.tcl
 
 ## 문서
 
-자세한 사양서는 [docs/spec.md](docs/spec.md)를 참조하세요.
+### 배포 패키지
+
+| 문서 | 설명 |
+|------|------|
+| [README.md](docs/delivery/README.md) | 배포 패키지 개요 |
+| [00_project_overview.md](docs/delivery/00_project_overview.md) | 프로젝트 개요 및 시스템 역할 |
+| [01_requirements.md](docs/delivery/01_requirements.md) | 기능 및 성능 요구사항 |
+| [02_interfaces.md](docs/delivery/02_interfaces.md) | SPI, LVDS, Bias Control, ADC 인터페이스 |
+| [03_timing_specifications.md](docs/delivery/03_timing_specifications.md) | 행/열 타이밍, 프레임 타이밍 |
+| [04_register_map.md](docs/delivery/04_register_map.md) | SPI 레지스터 주소 맵 |
+| [05_acceptance_criteria.md](docs/delivery/05_acceptance_criteria.md) | 검증 및 테스트 요구사항 |
+| [reference/](docs/delivery/reference/) | 패널 물리 특성 참고 문서 |
+
+### 요약 사양
+
+- [docs/spec.md](docs/spec.md) - 간단 사양 요약
 
 ## 라이선스
 
