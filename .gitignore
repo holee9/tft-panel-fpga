@@ -1,0 +1,40 @@
+# Vivado generated files
+*.cache
+*.data
+*.jou
+*.log
+*.runs
+*.hw
+*.sim
+*.xpr
+*.genome
+*.wdf
+*.ui
+
+# QuestaSim/ModelSim generated files
+transcript
+vsim.wlf
+*.wlf
+work/
+*.mtmp
+*.mpf
+
+# Build outputs
+*.bit
+*.bin
+*.mcs
+*.prm
+# Keep example bitstream for documentation
+!docs/*.bit
+
+# Temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.vsd
