@@ -115,7 +115,18 @@ L2 Idle 모드에서 주기적 화소 리셋
 - ADC readout 없음
 - 완료 시간: < 2 ms
 
-### 4. SPI 레지스터 인터페이스
+### 4. ADC FIFO 제어
+
+ADC 데이터 버퍼링 및 외부 읽기 인터페이스
+
+| 기능 | 설명 |
+|------|------|
+| FIFO 깊이 | 2048 샘플 |
+| fifo_rd | 외부 읽기 요청 신호 |
+| fifo_flush | FIFO 포인터 리셋 |
+| fifo_level[10:0] | FIFO 내 아이템 수 (0-2048) |
+
+### 5. SPI 레지스터 인터페이스
 
 MCU를 통한 FPGA 설정 및 상태 모니터링
 
@@ -129,6 +140,9 @@ MCU를 통한 FPGA 설정 및 상태 모니터링
 | 0x06-09 | ROW_START/END | RW | ROI 행 범위 |
 | 0x0A-0D | COL_START/END | RW | ROI 열 범위 |
 | 0x0E-0F | INTEGRATION_TIME | RW | 통합 시간 (ms) |
+| 0x18 | INT_EN | RW | 인터럽트 활성화 (개별 비트) |
+| 0x19 | INT_STATUS | RO | 인터럽트 상태 (Latch) |
+| 0x1A | INT_CLEAR | WO | 인터럽트 클리어 (Write-1-to-Clear) |
 | 0x17 | FIRMWARE_VERSION | RO | 펌웨어 버전 (0x10) |
 
 ## 시뮬레이션 결과
@@ -136,9 +150,12 @@ MCU를 통한 FPGA 설정 및 상태 모니터링
 | 테스트벤치 | 결과 | 설명 |
 |-----------|------|------|
 | tb_timing_generator | PASS | 2x2 ROI 테스트 |
+| tb_timing_generator_enhanced | PASS | 경계값/코너 케이스 테스트 (10케이스) |
 | tb_adc_controller | PASS | 2/2 테스트 통과 |
 | tb_dummy_scan_engine | PASS | 1/1 테스트 통과 |
 | tb_register_file | PASS | 3/3 테스트 통과 |
+| tb_spi_slave_interface | PASS | SPI 프로토콜 테스트 |
+| tb_spi_slave_interface_enhanced | PASS | 경계값/인터럽트 레지스터 테스트 (15케이스) |
 | tb_top | PASS | 전체 시스템 테스트 |
 
 ## 인터페이스 신호
@@ -177,6 +194,9 @@ MCU를 통한 FPGA 설정 및 상태 모니터링
 | adc_miso | Input | 1 | ADC MISO |
 | adc_clk | Output | 1 | ADC 클럭 (최대 20 MHz) |
 | adc_data[13:0] | Input | 14 | ADC 데이터 |
+| fifo_rd | Input | 1 | FIFO 읽기 요청 |
+| fifo_flush | Input | 1 | FIFO 플래시 |
+| fifo_level[10:0] | Output | 11 | FIFO 레벨 (0-2048) |
 | fifo_wr_en | Output | 1 | FIFO 쓰기 인에이블 |
 | fifo_wr_data[13:0] | Output | 14 | FIFO 쓰기 데이터 |
 
@@ -189,6 +209,17 @@ MCU를 통한 FPGA 설정 및 상태 모니터링
 | int_fifo_overflow | Output | FIFO 오버플로우 인터럽트 |
 | int_error | Output | 에러 인터럽트 |
 | int_active | Output | 인터럽트 활성 상태 |
+
+#### 인터럽트 타입 (INT_EN/INT_STATUS/INT_CLEAR)
+
+| 비트 | 인터럽트 | 설명 |
+|-----|---------|------|
+| 0 | FRAME_COMPLETE | 프레임 캡처 완료 |
+| 1 | FIFO_OVERFLOW | ADC FIFO 오버플로우 |
+| 2 | DUMMY_SCAN_COMPLETE | 더미 스캔 완료 |
+| 3 | BIAS_READY | Bias 모드 전환 완료 |
+| 4 | ADC_DATA_READY | ADC 데이터 변환 완료 |
+| 5-31 | Reserved | 예약 |
 
 ## 리소스 사용량 (예상)
 
