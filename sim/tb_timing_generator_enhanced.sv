@@ -25,6 +25,10 @@ module tb_timing_generator_enhanced;
     int fail_count = 0;
     int test_num = 0;
 
+    // Test pass variables (declared at the beginning)
+    logic test1_pass, test2_pass, test4_pass, test5_pass, test6_pass;
+    logic test7_pass;
+
     // Self-checking assertions
     property row_addr_in_range;
         @(posedge clk) frame_busy |-> (row_addr >= row_start && row_addr <= row_end + 1);
@@ -102,7 +106,6 @@ module tb_timing_generator_enhanced;
                     #10000;
                     $error("  Frame did not go busy!");
                     passed = 0;
-                    return;
                 end
             join_any
 
@@ -126,7 +129,8 @@ module tb_timing_generator_enhanced;
         end
     endtask
 
-    main: begin
+    initial begin
+        main: begin
         $display("========================================");
         $display("Enhanced Timing Generator Testbench");
         $display("Corner Case & Boundary Tests");
@@ -292,6 +296,7 @@ module tb_timing_generator_enhanced;
 
         #1000;
         $finish;
+        end
     end
 
     // Global timeout

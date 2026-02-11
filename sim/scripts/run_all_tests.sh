@@ -3,9 +3,10 @@
 # Run all simulations in separate batch sessions
 # =============================================================================
 
-cd "$(dirname "$0")" || exit 1
-
-SIM_DIR="."
+# Get absolute paths (handle both Git Bash and Windows)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Convert to relative paths for vsim compatibility
+SIM_DIR=".."
 RTL_PATH="../rtl"
 
 echo "=========================================="
@@ -13,7 +14,7 @@ echo "Compiling RTL and Testbenches"
 echo "=========================================="
 
 # Create library and compile
-vsim -c -do "vlib work; vlog -sv +acc ${RTL_PATH}/spi_slave_interface.sv ${RTL_PATH}/register_file.sv ${RTL_PATH}/timing_generator.sv ${RTL_PATH}/bias_mux_controller.sv ${RTL_PATH}/adc_controller.sv ${RTL_PATH}/dummy_scan_engine.sv ${RTL_PATH}/fpga_panel_controller.sv; vlog -sv +acc ${SIM_DIR}/tb_*.sv; quit" 2>&1 | grep -E "(Compiling module|Errors|Warnings|^#)"
+vsim -c -do "vlib work; vlog -sv +acc ${RTL_PATH}/spi_slave_interface.sv ${RTL_PATH}/register_file.sv ${RTL_PATH}/timing_generator.sv ${RTL_PATH}/bias_mux_controller.sv ${RTL_PATH}/adc_controller.sv ${RTL_PATH}/dummy_scan_engine.sv ${RTL_PATH}/fpga_panel_controller.sv; vlog -sv +acc ./tb_*.sv; quit" 2>&1 | grep -E "(Compiling module|Errors|Warnings|^#)"
 
 echo ""
 echo "=========================================="

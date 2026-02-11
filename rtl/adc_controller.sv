@@ -223,6 +223,6 @@ module adc_controller (
     assign fifo_overflow = adc_data_valid_int && fifo_full_int;
 
     // FIFO data output (registered read)
-    assign adc_data_reg = fifo_mem[fifo_rd_ptr];
+    // Note: adc_data_reg is now driven only by the procedural assignment below
 
 endmodule

@@ -26,6 +26,11 @@ module tb_spi_slave_interface_enhanced;
     int fail_count = 0;
     int test_num = 0;
 
+    // Test pass variables (declared at the beginning)
+    logic test1_pass, test2_pass, test3_pass, test4_pass, test5_pass;
+    logic test6_pass, test7_pass, test8_pass, test9_pass, test10_pass;
+    logic test11_pass, test12_pass, test13_pass, test14_pass, test15_pass;
+
     // Self-checking assertions
     property write_only_when_cs_active;
         @(posedge clk) reg_write |-> spi_cs_n == 0;
@@ -88,7 +93,8 @@ module tb_spi_slave_interface_enhanced;
         end
     endtask
 
-    main: begin
+    initial begin
+        main: begin
         $display("========================================");
         $display("Enhanced SPI Slave Interface Testbench");
         $display("Corner Case & Boundary Tests");
@@ -110,7 +116,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] Maximum register address (63/0x3F)", test_num + 1);
         test_num++;
         spi_write(8'd63, 32'hBABEFACE);
-        if (verify_write(8'd63, 32'hBABEFACE, test1_pass)) begin
+        verify_write(8'd63, 32'hBABEFACE, test1_pass);
+        if (test1_pass) begin
             $display("  [PASS] Max register address (63) accessible");
             pass_count++;
         end else begin
@@ -122,7 +129,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] Minimum register address (0)", test_num + 1);
         test_num++;
         spi_write(8'd0, 32'h12345678);
-        if (verify_write(8'd0, 32'h12345678, test2_pass)) begin
+        verify_write(8'd0, 32'h12345678, test2_pass);
+        if (test2_pass) begin
             $display("  [PASS] Register address 0 accessible");
             pass_count++;
         end else begin
@@ -134,7 +142,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] All zeros data pattern", test_num + 1);
         test_num++;
         spi_write(8'd10, 32'h00000000);
-        if (verify_write(8'd10, 32'h00000000, test3_pass)) begin
+        verify_write(8'd10, 32'h00000000, test3_pass);
+        if (test3_pass) begin
             $display("  [PASS] All zeros pattern handled correctly");
             pass_count++;
         end else begin
@@ -146,7 +155,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] All ones data pattern", test_num + 1);
         test_num++;
         spi_write(8'd11, 32'hFFFFFFFF);
-        if (verify_write(8'd11, 32'hFFFFFFFF, test4_pass)) begin
+        verify_write(8'd11, 32'hFFFFFFFF, test4_pass);
+        if (test4_pass) begin
             $display("  [PASS] All ones pattern handled correctly");
             pass_count++;
         end else begin
@@ -158,7 +168,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] Alternating pattern 0x55555555", test_num + 1);
         test_num++;
         spi_write(8'd12, 32'h55555555);
-        if (verify_write(8'd12, 32'h55555555, test5_pass)) begin
+        verify_write(8'd12, 32'h55555555, test5_pass);
+        if (test5_pass) begin
             $display("  [PASS] Alternating pattern 0x55 handled");
             pass_count++;
         end else begin
@@ -170,7 +181,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] Alternating pattern 0xAAAAAAAA", test_num + 1);
         test_num++;
         spi_write(8'd13, 32'hAAAAAAAA);
-        if (verify_write(8'd13, 32'hAAAAAAAA, test6_pass)) begin
+        verify_write(8'd13, 32'hAAAAAAAA, test6_pass);
+        if (test6_pass) begin
             $display("  [PASS] Alternating pattern 0xAA handled");
             pass_count++;
         end else begin
@@ -212,7 +224,8 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] Interrupt Enable register access", test_num + 1);
         test_num++;
         spi_write(8'd24, 32'h0000001F);  // Enable all 5 interrupts
-        if (verify_write(8'd24, 32'h0000001F, test8_pass)) begin
+        verify_write(8'd24, 32'h0000001F, test8_pass);
+        if (test8_pass) begin
             $display("  [PASS] INT_EN register (0x18/24) writable");
             pass_count++;
         end else begin
@@ -225,7 +238,8 @@ module tb_spi_slave_interface_enhanced;
         test_num++;
         mem[8'd25] = 32'h00000001;  // Set bit 0 in status
         spi_write(8'd25, 32'h00000000);  // Write to status (should be captured)
-        if (verify_write(8'd25, 32'h00000000, test9_pass)) begin
+        verify_write(8'd25, 32'h00000000, test9_pass);
+        if (test9_pass) begin
             $display("  [PASS] INT_STATUS register (0x19/25) accessible");
             pass_count++;
         end else begin
@@ -249,11 +263,14 @@ module tb_spi_slave_interface_enhanced;
         $display("\n[TEST %0d] Individual interrupt bit testing", test_num + 1);
         test_num++;
         test11_pass = 1;
-        for (int i = 0; i < 5; i++) begin
-            logic [31:0] mask = (32'd1 << i);
-            spi_write(8'd24, mask);
-            #50;
-            if (!(reg_addr == 8'd24 && reg_wdata == mask)) test11_pass = 0;
+        begin
+            logic [31:0] mask;
+            for (int i = 0; i < 5; i++) begin
+                mask = (32'd1 << i);
+                spi_write(8'd24, mask);
+                #50;
+                if (!(reg_addr == 8'd24 && reg_wdata == mask)) test11_pass = 0;
+            end
         end
         if (test11_pass) begin
             $display("  [PASS] All individual interrupt bits testable");
@@ -276,7 +293,8 @@ module tb_spi_slave_interface_enhanced;
         #50;
         // Start new transaction
         spi_write(8'd30, 32'hCAFEBABE);
-        if (verify_write(8'd30, 32'hCAFEBABE, test12_pass)) begin
+        verify_write(8'd30, 32'hCAFEBABE, test12_pass);
+        if (test12_pass) begin
             $display("  [PASS] CS_N toggle recovery successful");
             pass_count++;
         end else begin
@@ -287,10 +305,8 @@ module tb_spi_slave_interface_enhanced;
         // Test 13: Clock edge timing verification
         $display("\n[TEST %0d] SPI Mode 0 timing verification", test_num + 1);
         test_num++;
-        logic sclk_last;
         spi_cs_n = 0;
         #20;
-        sclk_last = 0;
         for (int i = 0; i < 10; i++) begin
             #10; spi_sclk = 1;
             // Data should be stable before rising edge
@@ -359,13 +375,10 @@ module tb_spi_slave_interface_enhanced;
 
         #1000;
         $finish;
+        end
     end
 
-    // Variables for test results
-    logic test1_pass, test2_pass, test3_pass, test4_pass, test5_pass;
-    logic test6_pass, test7_pass, test8_pass, test9_pass, test10_pass;
-    logic test11_pass, test12_pass, test13_pass, test14_pass, test15_pass;
-
+  
     // Global timeout
     initial begin #500000000 $display("ERROR: Global timeout!"); $finish; end
 

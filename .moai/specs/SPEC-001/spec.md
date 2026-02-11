@@ -6,7 +6,7 @@
 |-------|-------|
 | **Spec ID** | SPEC-001 |
 | **Title** | TFT Panel FPGA Controller - Full Implementation |
-| **Status** | Planning |
+| **Status** | Completed |
 | **Priority** | High |
 | **Created** | 2026-02-10 |
 | **Author** | MoAI Team |
@@ -98,14 +98,14 @@ Implement a complete FPGA controller for a-Si TFT Flat Panel Detector (R1717AS01
 
 | Module | Current | Required | Gap |
 |--------|---------|----------|-----|
-| Top Module | 13 ports | 44 ports | Missing 31 ports |
-| SPI Slave | Working | Working | OK |
-| Register File | 8 regs | 64 regs | Missing 56 |
-| Timing Generator | None | FSM + clocks | Missing |
-| Bias Controller | Simple output | 3-mode FSM | Incomplete |
-| Dummy Scan Engine | None | Timer + sequencer | Missing |
-| ADC Controller | Placeholder | Full interface | Missing |
-| Testbenches | Skeleton | 90% coverage | Incomplete |
+| Top Module | 44 ports | 44 ports | **OK** |
+| SPI Slave | Full implementation | Working | **OK** |
+| Register File | 64 regs + INT system | 64 regs | **OK** (with enhanced INT) |
+| Timing Generator | FSM + clocks | FSM + clocks | **OK** |
+| Bias Controller | 3-mode FSM | 3-mode FSM | **OK** |
+| Dummy Scan Engine | Timer + sequencer | Timer + sequencer | **OK** |
+| ADC Controller | Full interface + FIFO | Full interface | **OK** (with enhanced FIFO) |
+| Testbenches | 9 testbenches (including enhanced) | 90% coverage | **OK** |
 
 ---
 
