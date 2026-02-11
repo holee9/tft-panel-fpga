@@ -38,3 +38,14 @@ Thumbs.db
 .vscode/
 .idea/
 *.vsd
+
+# Backup files
+*.bak
+*.sv.bak
+.claude/settings.local.json.bak
+
+# Simulation artifacts
+*.vcd
+*.vstf
+&1
+&*
