@@ -29,19 +29,36 @@ module bias_mux_controller (
     end
     
     always_ff @(posedge clk) begin
-        if (!rst_n) {switch_counter, target_bias} <= 0;
-        else case (current_state)
-            IDLE: switch_counter <= 0;
-            SWITCHING: if (switch_counter < SWITCH_CYCLES - 1) switch_counter <= switch_counter + 1;
-            READY: if (target_bias != current_bias) switch_counter <= 0;
-        endcase
+        if (!rst_n) begin
+            {switch_counter, target_bias} <= 0;
+        end else begin
+            target_bias <= bias_mode_select;
+            case (current_state)
+                IDLE: switch_counter <= 0;
+                SWITCHING: if (switch_counter < SWITCH_CYCLES - 1) switch_counter <= switch_counter + 1;
+                READY: if (target_bias != current_bias) switch_counter <= 0;
+            endcase
+        end
     end
     
     always_ff @(posedge clk) begin
         if (!rst_n) {bias_select_reg, current_bias} <= 0;
         else case (current_state)
-            IDLE: if (target_bias == current_bias) bias_select_reg <= {target_bias, 1'b0};
-            SWITCHING: if (switch_counter == SWITCH_CYCLES/2) {bias_select_reg, current_bias} <= {target_bias, 1'b0, target_bias};
+            IDLE: if (target_bias == current_bias) begin
+                case (target_bias)
+                    2'b00: bias_select_reg <= 3'b000; // NORMAL_BIAS: all low
+                    2'b01: bias_select_reg <= 3'b000; // IDLE_LOW_BIAS: all low  
+                    2'b10: bias_select_reg <= 3'b111; // SLEEP_BIAS: all high
+                endcase
+            end
+            SWITCHING: if (switch_counter == SWITCH_CYCLES/2) begin
+                case (target_bias)
+                    2'b00: bias_select_reg <= 3'b000; // NORMAL_BIAS: all low
+                    2'b01: bias_select_reg <= 3'b000; // IDLE_LOW_BIAS: all low
+                    2'b10: bias_select_reg <= 3'b111; // SLEEP_BIAS: all high
+                endcase
+                current_bias <= target_bias;
+            end
         endcase
     end
     

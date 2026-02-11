@@ -1,4 +1,4 @@
-// Bias Mux Controller Testbench
+// Bias Mux Controller Testbench - Fixed Version
 `timescale 1ns/1ps
 module tb_bias_mux_controller;
     logic clk, rst_n;
@@ -20,29 +20,29 @@ module tb_bias_mux_controller;
 
         $display("[TEST 1] NORMAL_BIAS mode");
         bias_mode_select = 2'b00;
-        #1000;
+        #5000;  // Wait for state transition
         if (v_pd_n === 1'b0 && v_col_n === 1'b0 && v_rg_n === 1'b0)
             $display("[PASS] NORMAL mode test");
         else
-            $display("[FAIL] NORMAL mode test");
+            $display("[FAIL] NORMAL mode test - pd: %b, col: %b, rg: %b", v_pd_n, v_col_n, v_rg_n);
 
         #5000;
         $display("[TEST 2] IDLE_LOW_BIAS mode");
         bias_mode_select = 2'b01;
-        #10000;
+        #10000; // Wait for state transition
         if (v_pd_n === 1'b0 && v_col_n === 1'b0)
             $display("[PASS] IDLE_LOW mode test");
         else
-            $display("[FAIL] IDLE_LOW mode test");
+            $display("[FAIL] IDLE_LOW mode test - pd: %b, col: %b", v_pd_n, v_col_n);
 
         #5000;
         $display("[TEST 3] SLEEP_BIAS mode");
         bias_mode_select = 2'b10;
-        #10000;
+        #10000; // Wait for state transition
         if (v_pd_n === 1'b1 && v_col_n === 1'b1 && v_rg_n === 1'b1)
             $display("[PASS] SLEEP mode test");
         else
-            $display("[FAIL] SLEEP mode test");
+            $display("[FAIL] SLEEP mode test - pd: %b, col: %b, rg: %b", v_pd_n, v_col_n, v_rg_n);
 
         #1000;
         $display("=== All Tests Completed ===");

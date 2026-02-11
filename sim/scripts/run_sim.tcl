@@ -3,49 +3,78 @@
 # =============================================================================
 # Purpose: Run simulation with Questa Sim 2025
 # Usage: vsim -c -do "source scripts/run_sim.tcl"
+# Note: Uses onfinish finish to prevent batch session exit
 # =============================================================================
 
 # Set project variables
-set TOP_MODULE tb_top
 set RTL_PATH ../rtl
 set SIM_PATH .
 
 # Create library
 vlib work
 
-# Compile RTL files
+# Compile all RTL files
 vlog -sv +acc \
-    ${RTL_PATH}/fpga_panel_controller.sv \
     ${RTL_PATH}/spi_slave_interface.sv \
-    ${RTL_PATH}/register_file.sv
+    ${RTL_PATH}/register_file.sv \
+    ${RTL_PATH}/timing_generator.sv \
+    ${RTL_PATH}/bias_mux_controller.sv \
+    ${RTL_PATH}/adc_controller.sv \
+    ${RTL_PATH}/dummy_scan_engine.sv \
+    ${RTL_PATH}/fpga_panel_controller.sv
 
-# Compile testbench
-vlog -sv +acc ${SIM_PATH}/tb_top.sv
+# Compile testbenches
+vlog -sv +acc \
+    ${SIM_PATH}/tb_spi_slave_interface.sv \
+    ${SIM_PATH}/tb_register_file.sv \
+    ${SIM_PATH}/tb_timing_generator.sv \
+    ${SIM_PATH}/tb_bias_mux_controller.sv \
+    ${SIM_PATH}/tb_adc_controller.sv \
+    ${SIM_PATH}/tb_dummy_scan_engine.sv \
+    ${SIM_PATH}/tb_top.sv
 
-# Elaborate
-vsim -t ps -c work.${TOP_MODULE}
+# Configure onfinish to prevent session exit
+onfinish finish
 
-# Add waves
-add wave -position insertpoint  \
-    sim:/tb_top/clk \
-    sim:/tb_top/rst_n \
-    sim:/tb_top/spi_cs_n \
-    sim:/tb_top/spi_sclk \
-    sim:/tb_top/spi_mosi \
-    sim:/tb_top/spi_miso
+puts "\n=========================================="
+puts "Running Individual Module Tests"
+puts "==========================================\n"
 
-add wave -position insertpoint  \
-    sim:/tb_top/bias_sel \
-    sim:/tb_top/gate_en \
-    sim:/tb_top/data_en \
-    sim:/tb_top/scan_start
+# Test individual modules
+puts "\n--- Testing SPI Slave Interface ---"
+vsim -t ps -c work.tb_spi_slave_interface
+run -all
+# vsim exits on $finish from testbench, continue with next test
 
-add wave -position insertpoint  \
-    sim:/tb_top/led_idle \
-    sim:/tb_top/led_active
-
-# Run simulation
+puts "\n--- Testing Register File ---"
+vsim -t ps -c work.tb_register_file
 run -all
 
-# Exit
+puts "\n--- Testing Timing Generator ---"
+vsim -t ps -c work.tb_timing_generator
+run -all
+
+puts "\n--- Testing Bias Mux Controller ---"
+vsim -t ps -c work.tb_bias_mux_controller
+run -all
+
+puts "\n--- Testing ADC Controller ---"
+vsim -t ps -c work.tb_adc_controller
+run -all
+
+puts "\n--- Testing Dummy Scan Engine ---"
+vsim -t ps -c work.tb_dummy_scan_engine
+run -all
+
+puts "\n=========================================="
+puts "Running Top-Level System Test"
+puts "==========================================\n"
+
+vsim -t ps -c work.tb_top
+run -all
+
+puts "\n=========================================="
+puts "All Tests Completed"
+puts "==========================================\n"
+
 quit
