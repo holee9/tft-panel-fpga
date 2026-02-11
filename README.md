@@ -122,9 +122,9 @@ ADC 데이터 버퍼링 및 외부 읽기 인터페이스
 | 기능 | 설명 |
 |------|------|
 | FIFO 깊이 | 2048 샘플 |
-| fifo_rd | 외부 읽기 요청 신호 |
-| fifo_flush | FIFO 포인터 리셋 |
-| fifo_level[10:0] | FIFO 내 아이템 수 (0-2048) |
+| fifo_rd | 외부 읽기 요청 신호 (레지스터 스테이지 포함) |
+| fifo_flush | FIFO 포인터 리셋 (동기 리셋) |
+| fifo_level[10:0] | FIFO 내 아이템 수 실시간 모니터링 (0-2048) |
 
 ### 5. SPI 레지스터 인터페이스
 
@@ -156,7 +156,11 @@ MCU를 통한 FPGA 설정 및 상태 모니터링
 | tb_register_file | PASS | 3/3 테스트 통과 |
 | tb_spi_slave_interface | PASS | SPI 프로토콜 테스트 |
 | tb_spi_slave_interface_enhanced | PASS | 경계값/인터럽트 레지스터 테스트 (15케이스) |
+| tb_bias_mux_controller | PASS | 모드 전환 테스트 통과 |
 | tb_top | PASS | 전체 시스템 테스트 |
+| tb_minimal | PASS | 최소 기능 테스트 |
+
+**전체 테스트 통과율: 100% (10/10)**
 
 ## 인터페이스 신호
 
